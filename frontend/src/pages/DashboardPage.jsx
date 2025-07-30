@@ -35,6 +35,17 @@ export default function DashboardPage() {
   const handleAssignClick = (projectId) => {
     setAssignModalData({ open: true, projectId });
   };
+  
+  const handleMarkCompleted = async (projectId) => {
+    try {
+      await API.put(`/projects/${projectId}/complete`);
+      alert("Project marked as completed!");
+      fetchProjects(); // Refresh project list
+    } catch (err) {
+      alert(err.response?.data?.message || "Failed to mark project completed");
+    }
+  };
+
 
   return (
     <div className="p-6">
