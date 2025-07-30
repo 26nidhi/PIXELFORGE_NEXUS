@@ -1,12 +1,13 @@
 import { useParams } from "react-router-dom";
 import { useContext, useState } from "react";
 import { AuthContext } from "../context/AuthContext";
+import DocumentList from "../components/DocumentList";
 
 export default function ProjectDetailsPage() {
-  const { id } = useParams(); // Project ID from URL
+  const { id } = useParams();
   const { user } = useContext(AuthContext);
 
-  // Placeholder data (replace with API later)
+  // Mock project data
   const project = {
     id,
     name: "Space Adventure",
@@ -21,7 +22,7 @@ export default function ProjectDetailsPage() {
   const handleUpload = (e) => {
     e.preventDefault();
     if (file) {
-      alert(`File uploaded: ${file.name}`);
+      alert(`Uploaded: ${file.name}`);
       setFile(null);
     }
   };
@@ -39,19 +40,11 @@ export default function ProjectDetailsPage() {
         ))}
       </ul>
 
-      <h2 className="text-xl font-semibold mb-2">Documents:</h2>
-      <ul className="list-disc pl-6 mb-6">
-        {project.documents.map((doc, i) => (
-          <li key={i}>
-            <a href="#" className="text-blue-500 underline">
-              {doc}
-            </a>
-          </li>
-        ))}
-      </ul>
+      <h2 className="text-xl font-semibold mb-2">Project Documents:</h2>
+      <DocumentList documents={project.documents} />
 
       {(user.role === "Admin" || user.role === "Project Lead") && (
-        <form onSubmit={handleUpload}>
+        <form onSubmit={handleUpload} className="mt-4">
           <input
             type="file"
             onChange={(e) => setFile(e.target.files[0])}
