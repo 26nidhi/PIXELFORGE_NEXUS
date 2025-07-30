@@ -61,6 +61,18 @@ export default function DashboardPage() {
         {projects.map((project) => (
           <div key={project._id} className="relative">
             <ProjectCard project={project} />
+
+            {/* Admin: Mark Completed */}
+            {user.role === "Admin" && project.status === "Active" && (
+              <button
+                className="absolute top-2 right-2 bg-yellow-500 text-white px-3 py-1 rounded"
+                onClick={() => handleMarkCompleted(project._id)}
+              >
+                Mark Completed
+              </button>
+            )}
+
+            {/* Project Lead: Assign Developers */}
             {user.role === "Project Lead" && (
               <button
                 className="absolute top-2 right-2 bg-blue-500 text-white px-3 py-1 rounded"
