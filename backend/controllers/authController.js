@@ -44,3 +44,14 @@ export const loginUser = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
+
+export const getLeads = async (req, res) => {
+  const leads = await User.find({ role: "Project Lead" }, "name email");
+  res.json(leads);
+};
+
+export const getDevelopers = async (req, res) => {
+  const developers = await User.find({ role: "Developer" }, "name email");
+  res.json(developers);
+};
+
