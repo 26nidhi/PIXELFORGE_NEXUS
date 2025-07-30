@@ -1,31 +1,54 @@
 import { useParams } from "react-router-dom";
-import { useContext, useState } from "react";
+import { useContext, useState, useEffect } from "react";
 import { AuthContext } from "../context/AuthContext";
 import DocumentList from "../components/DocumentList";
+import API from "../api";
 
 export default function ProjectDetailsPage() {
   const { id } = useParams();
   const { user } = useContext(AuthContext);
-
-  // Mock project data
-  const project = {
-    id,
-    name: "Space Adventure",
-    description: "A 3D space exploration game.",
-    deadline: "2025-12-31",
-    team: ["Alice", "Bob"],
-    documents: ["DesignDoc.pdf", "MeetingNotes.pdf"],
-  };
-
+  const [project, setProject] = useState(null);
+  const [documents, setDocuments] = useState([]);
   const [file, setFile] = useState(null);
 
-  const handleUpload = (e) => {
+  // Fetch project details & documents
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const { data: projectDocs } = await API.get(`/documents/${id}`);
+        setDocuments(projectDocs);
+
+        const { data: userProjects } = await API.get("/projects/my-projects");
+        const selectedProject = userProjects.find((p) => p._id === id);
+        setProject(selectedProject);
+      } catch (err) {
+        console.error(err);
+      }
+    };
+    fetchData();
+  }, [id]);
+
+  const handleUpload = async (e) => {
     e.preventDefault();
-    if (file) {
-      alert(`Uploaded: ${file.name}`);
+    const formData = new FormData();
+    formData.append("file", file);
+
+    try {
+      await API.post(`/documents/${id}/upload`, formData, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
+      alert("Document uploaded");
       setFile(null);
+
+      // Refresh documents
+      const { data: updatedDocs } = await API.get(`/documents/${id}`);
+      setDocuments(updatedDocs);
+    } catch (err) {
+      alert(err.response?.data?.message || "Upload failed");
     }
   };
+
+  if (!project) return <p className="p-6">Loading project...</p>;
 
   return (
     <div className="p-6">
@@ -33,15 +56,8 @@ export default function ProjectDetailsPage() {
       <p className="text-gray-600 mb-4">{project.description}</p>
       <p className="text-sm text-gray-500 mb-6">Deadline: {project.deadline}</p>
 
-      <h2 className="text-xl font-semibold mb-2">Team Members:</h2>
-      <ul className="list-disc pl-6 mb-6">
-        {project.team.map((member, i) => (
-          <li key={i}>{member}</li>
-        ))}
-      </ul>
-
       <h2 className="text-xl font-semibold mb-2">Project Documents:</h2>
-      <DocumentList documents={project.documents} />
+      <DocumentList documents={documents.map((d) => d.filename)} />
 
       {(user.role === "Admin" || user.role === "Project Lead") && (
         <form onSubmit={handleUpload} className="mt-4">
