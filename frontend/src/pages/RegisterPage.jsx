@@ -1,7 +1,10 @@
-import { useState } from "react";
+import { useState, useContext } from "react";
+import { AuthContext } from "../context/AuthContext";
 import { useNavigate } from "react-router-dom";
+import API from "../api";
 
 export default function RegisterPage() {
+  const { user } = useContext(AuthContext);
   const navigate = useNavigate();
 
   const [name, setName] = useState("");
@@ -9,10 +12,19 @@ export default function RegisterPage() {
   const [password, setPassword] = useState("");
   const [role, setRole] = useState("Developer");
 
-  const handleRegister = (e) => {
-    e.preventDefault();
-    alert(`User Registered: ${name} - ${role}`);
+  if (!user || user.role !== "Admin") {
     navigate("/dashboard");
+  }
+
+  const handleRegister = async (e) => {
+    e.preventDefault();
+    try {
+      await API.post("/auth/register", { name, email, password, role });
+      alert("User registered successfully");
+      navigate("/dashboard");
+    } catch (err) {
+      alert(err.response?.data?.message || "Registration failed");
+    }
   };
 
   return (
