@@ -1,29 +1,28 @@
-import { useContext } from "react";
+import { useContext, useEffect, useState } from "react";
 import { AuthContext } from "../context/AuthContext";
 import ProjectCard from "../components/ProjectCard";
+import API from "../api";
 
 export default function DashboardPage() {
   const { user } = useContext(AuthContext);
+  const [projects, setProjects] = useState([]);
 
-  if (!user) return <p className="text-center mt-10">Unauthorized</p>;
-
-  // Mock project data
-  const projects = [
-    {
-      id: "1",
-      name: "Space Adventure",
-      description: "A 3D space exploration game.",
-      deadline: "2025-12-31",
-      status: "Active",
-    },
-    {
-      id: "2",
-      name: "Pixel Quest",
-      description: "Retro RPG with pixel graphics.",
-      deadline: "2025-10-15",
-      status: "Completed",
-    },
-  ];
+  useEffect(() => {
+    const fetchProjects = async () => {
+      try {
+        if (user.role === "Admin") {
+          const { data } = await API.get("/projects");
+          setProjects(data);
+        } else {
+          const { data } = await API.get("/projects/my-projects");
+          setProjects(data);
+        }
+      } catch (err) {
+        console.error(err);
+      }
+    };
+    fetchProjects();
+  }, [user.role]);
 
   return (
     <div className="p-6">
@@ -40,20 +39,9 @@ export default function DashboardPage() {
         </div>
       )}
 
-      {user.role === "Project Lead" && (
-        <div className="mb-4">
-          <button className="bg-blue-500 text-white px-4 py-2 rounded mr-2">
-            Assign Developers
-          </button>
-          <button className="bg-orange-500 text-white px-4 py-2 rounded">
-            Upload Documents
-          </button>
-        </div>
-      )}
-
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {projects.map((project) => (
-          <ProjectCard key={project.id} project={project} />
+          <ProjectCard key={project._id} project={project} />
         ))}
       </div>
     </div>
