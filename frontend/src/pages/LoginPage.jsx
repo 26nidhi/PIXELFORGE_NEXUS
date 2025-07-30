@@ -1,6 +1,7 @@
 import { useState, useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import { AuthContext } from "../context/AuthContext";
+import API from "../api";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
@@ -10,10 +11,12 @@ export default function LoginPage() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    // TEMP: replace with backend API call
-    if (email && password) {
-      login({ name: "John Doe", role: "Admin", token: "abc123" });
+    try {
+      const { data } = await API.post("/auth/login", { email, password });
+      login({ token: data.token, role: data.user.role, name: data.user.name });
       navigate("/dashboard");
+    } catch (err) {
+      alert(err.response?.data?.message || "Login failed");
     }
   };
 
