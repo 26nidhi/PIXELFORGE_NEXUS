@@ -1,9 +1,7 @@
-import { useState, useContext } from "react";
-import { AuthContext } from "../context/AuthContext";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 export default function RegisterPage() {
-  const { user } = useContext(AuthContext);
   const navigate = useNavigate();
 
   const [name, setName] = useState("");
@@ -11,14 +9,8 @@ export default function RegisterPage() {
   const [password, setPassword] = useState("");
   const [role, setRole] = useState("Developer");
 
-  // Redirect if not admin
-  if (!user || user.role !== "Admin") {
-    navigate("/dashboard");
-  }
-
-  const handleRegister = async (e) => {
+  const handleRegister = (e) => {
     e.preventDefault();
-    // Replace with API call later
     alert(`User Registered: ${name} - ${role}`);
     navigate("/dashboard");
   };
