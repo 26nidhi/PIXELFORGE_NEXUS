@@ -6,7 +6,9 @@ const connectDB = async () => {
       useNewUrlParser: true,
       useUnifiedTopology: true,
     });
-    console.log("MongoDB Connected");
+
+    // Debug: Print connected DB name
+    console.log("Connected to MongoDB Database:", mongoose.connection.name);
   } catch (error) {
     console.error("DB Connection Failed", error);
     process.exit(1);
