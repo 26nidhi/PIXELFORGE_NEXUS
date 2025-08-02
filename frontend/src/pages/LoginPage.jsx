@@ -12,7 +12,12 @@ export default function LoginPage() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const { data } = await API.post("/auth/login", { email, password });
+      const payload = {
+        email: email.trim().toLowerCase(),
+        password,
+      };
+      console.log("Sending login payload:", payload); // debug
+      const { data } = await API.post("/auth/login", payload);
       login({ token: data.token, role: data.user.role, name: data.user.name });
       navigate("/dashboard");
     } catch (err) {
