@@ -7,6 +7,7 @@ import SettingsPage from "./pages/SettingsPage";
 import Navbar from "./components/Navbar";
 import ProtectedRoute from "./components/ProtectedRoute";
 
+
 function App() {
   return (
     <Router>
